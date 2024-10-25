@@ -4,6 +4,7 @@ import (
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common"
 	"github.com/gofrs/uuid/v5"
+	"gorm.io/gorm"
 )
 
 type Login interface {
@@ -31,6 +32,8 @@ type SysUser struct {
 	Email         string         `json:"email"  gorm:"comment:用户邮箱"`                                                                         // 用户邮箱
 	Enable        int            `json:"enable" gorm:"default:1;comment:用户是否被冻结 1正常 2冻结"`                                                    //用户是否被冻结 1正常 2冻结
 	OriginSetting common.JSONMap `json:"originSetting" form:"originSetting" gorm:"type:text;default:null;column:origin_setting;comment:配置;"` //配置
+	StartAt       gorm.DeletedAt `json:"start_at" gorm:"comment:服务开始时间"`
+	EndAt         gorm.DeletedAt `json:"end_at" gorm:"comment:服务结束时间"`
 }
 
 func (SysUser) TableName() string {

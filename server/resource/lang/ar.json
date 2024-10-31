@@ -309,7 +309,7 @@
                 "userLoginRequired": "تسجيل دخول المستخدم (مطلوب)",
                 "userRegistration": "تسجيل المستخدم",
                 "tableDataInitFail": "فشل في تهيئة بيانات الجدول"
-            },
+            ,"updateupayAPP":"update应用","findupayAPP":"find应用","listupayAPP":"list应用","addupayAPP":"add应用","deleteupayAPP":"delete应用","batchupayAPP":"batch应用","updateupayWalletAddress":"update收款钱包","findupayWalletAddress":"find收款钱包","listupayWalletAddress":"list收款钱包","addupayWalletAddress":"add收款钱包","deleteupayWalletAddress":"delete收款钱包","batchupayWalletAddress":"batch收款钱包","addupayPayOrder":"add支付订单","deleteupayPayOrder":"delete支付订单","batchupayPayOrder":"batch支付订单","updateupayPayOrder":"update支付订单","findupayPayOrder":"find支付订单","listupayPayOrder":"list支付订单"},
             "group": {
                 "announcement": "الإعلان",
                 "api": "API",
@@ -331,7 +331,7 @@
                 "systemUser": "مستخدم النظام",
                 "tableTemplate": "قالب الجدول",
                 "templateConfiguration": "تكوين القالب"
-            }
+            ,"upayAPP":"应用","upayWalletAddress":"收款钱包","upayPayOrder":"支付订单"}
         },
         "authority": {
             "normalUserSubRole": "عادي المستخدم subrole",
@@ -392,7 +392,7 @@
             "buttonKey": "مفتاح الزر",
             "buttonComment": "تعليق الزر",
             "menuID": "معرف القائمة"
-        }
+        ,"upayAPP":"应用","upayWalletAddress":"收款钱包","upayPayOrder":"支付订单"}
     },
     "announcement": {
         "publicAnnouncementAPI": "معلومات واجهة الإعلان التي لا تتطلب مصادقة",

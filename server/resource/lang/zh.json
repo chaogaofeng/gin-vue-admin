@@ -320,7 +320,7 @@
                 "userLoginRequired": "用户登录(必选)",
                 "userRegistration": "用户注册",
                 "tableDataInitFail": "表数据初始化失败"
-            },
+            ,"deleteupayAPP":"delete应用","batchupayAPP":"batch应用","updateupayAPP":"update应用","findupayAPP":"find应用","listupayAPP":"list应用","addupayAPP":"add应用","findupayWalletAddress":"find收款钱包","listupayWalletAddress":"list收款钱包","addupayWalletAddress":"add收款钱包","deleteupayWalletAddress":"delete收款钱包","batchupayWalletAddress":"batch收款钱包","updateupayWalletAddress":"update收款钱包","batchupayPayOrder":"batch支付订单","updateupayPayOrder":"update支付订单","findupayPayOrder":"find支付订单","listupayPayOrder":"list支付订单","addupayPayOrder":"add支付订单","deleteupayPayOrder":"delete支付订单"},
             "group": {
                 "announcement": "公告",
                 "api": "API",
@@ -342,7 +342,7 @@
                 "systemUser": "系统用户",
                 "tableTemplate": "表格模板",
                 "templateConfiguration": "模板配置"
-            }
+            ,"upayAPP":"应用","upayWalletAddress":"收款钱包","upayPayOrder":"支付订单"}
         },
         "authority": {
             "normalUserSubRole": "普通用户子角色",
@@ -404,7 +404,7 @@
             "buttonKey": "按钮关键key",
             "buttonComment": "按钮备注",
             "menuID": "菜单ID"
-        }
+        ,"upayAPP":"应用","upayWalletAddress":"收款钱包","upayPayOrder":"支付订单"}
     },
     "announcement": {
         "publicAnnouncementAPI": "不需要鉴权的公告接口信息",

@@ -316,7 +316,7 @@
                 "userLoginRequired": "User login (required)",
                 "userRegistration": "User registration",
                 "tableDataInitFail": "Table data initialization failed"
-            },
+            ,"addupayAPP":"add应用","deleteupayAPP":"delete应用","batchupayAPP":"batch应用","updateupayAPP":"update应用","findupayAPP":"find应用","listupayAPP":"list应用","updateupayWalletAddress":"update收款钱包","findupayWalletAddress":"find收款钱包","listupayWalletAddress":"list收款钱包","addupayWalletAddress":"add收款钱包","deleteupayWalletAddress":"delete收款钱包","batchupayWalletAddress":"batch收款钱包","batchupayPayOrder":"batch支付订单","updateupayPayOrder":"update支付订单","findupayPayOrder":"find支付订单","listupayPayOrder":"list支付订单","addupayPayOrder":"add支付订单","deleteupayPayOrder":"delete支付订单"},
             "group": {
                 "announcement": "Announcement",
                 "api": "API",
@@ -338,7 +338,7 @@
                 "systemUser": "System User",
                 "tableTemplate": "Table Templates",
                 "templateConfiguration": "Template Configuration"
-            }
+            ,"upayAPP":"应用","upayWalletAddress":"收款钱包","upayPayOrder":"支付订单"}
         },
         "authority": {
             "normalUserSubRole": "Normal User Sub-Role",
@@ -400,7 +400,7 @@
             "buttonKey": "Button Key",
             "buttonComment": "Button Comment",
             "menuID": "Menu ID"
-        }
+        ,"upayAPP":"应用","upayWalletAddress":"收款钱包","upayPayOrder":"支付订单"}
     },
     "announcement": {
         "publicAnnouncementAPI": "Announcement API information that does not require authentication",

@@ -13,7 +13,7 @@ type APP struct {
 	AppId     string `json:"appId" form:"appId" gorm:"uniqueIndex;column:app_id;comment:应用标识;" binding:"required"`        //应用标识
 	AppSecret string `json:"appSecret" form:"appSecret" gorm:"unique;column:app_secret;comment:应用密钥;" binding:"required"` //应用密钥
 	AppName   string `json:"appName" form:"appName" gorm:"column:app_name;comment:应用名称;"`                                 //应用名称
-	UserID    *int   `json:"userID" form:"userID" gorm:"column:user_id;comment:用户;" binding:"required"`                   //用户
+	UserID    *int   `json:"userID" form:"userID" gorm:"column:user_id;comment:用户;"`                                      //用户
 	Status    string `json:"status" form:"status" gorm:"default:0;column:status;comment:应用状态;" binding:"required"`        //应用状态
 }
 

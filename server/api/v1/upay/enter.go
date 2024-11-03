@@ -6,6 +6,7 @@ type ApiGroup struct {
 	APPApi
 	WalletAddressApi
 	PayOrderApi
+	OpenApi
 }
 
 var (

@@ -1,18 +1,16 @@
 package upay
 
 import (
-	
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
-    "github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
-    "github.com/flipped-aurora/gin-vue-admin/server/model/upay"
-    upayReq "github.com/flipped-aurora/gin-vue-admin/server/model/upay/request"
-    "github.com/gin-gonic/gin"
-    "go.uber.org/zap"
+	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
+	"github.com/flipped-aurora/gin-vue-admin/server/model/upay"
+	upayReq "github.com/flipped-aurora/gin-vue-admin/server/model/upay/request"
+	"github.com/flipped-aurora/gin-vue-admin/server/utils"
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
-type PayOrderApi struct {}
-
-
+type PayOrderApi struct{}
 
 // CreatePayOrder 创建支付订单
 // @Tags PayOrder
@@ -30,13 +28,15 @@ func (payOrderApi *PayOrderApi) CreatePayOrder(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
+	uid := int(utils.GetUserID(c))
+	payOrder.UserID = &uid
 	err = payOrderService.CreatePayOrder(&payOrder)
 	if err != nil {
-        global.GVA_LOG.Error(global.Translate("general.creationFail"), zap.Error(err))
+		global.GVA_LOG.Error(global.Translate("general.creationFail"), zap.Error(err))
 		response.FailWithMessage(global.Translate("general.creationFailErr"), c)
 		return
 	}
-    response.OkWithMessage(global.Translate("general.createSuccess"), c)
+	response.OkWithMessage(global.Translate("general.createSuccess"), c)
 }
 
 // DeletePayOrder 删除支付订单
@@ -52,7 +52,7 @@ func (payOrderApi *PayOrderApi) DeletePayOrder(c *gin.Context) {
 	ID := c.Query("ID")
 	err := payOrderService.DeletePayOrder(ID)
 	if err != nil {
-        global.GVA_LOG.Error(global.Translate("general.deleteFail"), zap.Error(err))
+		global.GVA_LOG.Error(global.Translate("general.deleteFail"), zap.Error(err))
 		response.FailWithMessage(global.Translate("general.deleteFailErr"), c)
 		return
 	}
@@ -71,7 +71,7 @@ func (payOrderApi *PayOrderApi) DeletePayOrderByIds(c *gin.Context) {
 	IDs := c.QueryArray("IDs[]")
 	err := payOrderService.DeletePayOrderByIds(IDs)
 	if err != nil {
-        global.GVA_LOG.Error(global.Translate("system.sys_operation_record.batchDeleteFail"), zap.Error(err))
+		global.GVA_LOG.Error(global.Translate("system.sys_operation_record.batchDeleteFail"), zap.Error(err))
 		response.FailWithMessage(global.Translate("system.sys_operation_record.batchDeleteFailErr"), c)
 		return
 	}
@@ -96,7 +96,7 @@ func (payOrderApi *PayOrderApi) UpdatePayOrder(c *gin.Context) {
 	}
 	err = payOrderService.UpdatePayOrder(payOrder)
 	if err != nil {
-        global.GVA_LOG.Error(global.Translate("general.updateFail"), zap.Error(err))
+		global.GVA_LOG.Error(global.Translate("general.updateFail"), zap.Error(err))
 		response.FailWithMessage(global.Translate("general.updateFailErr"), c)
 		return
 	}
@@ -116,7 +116,7 @@ func (payOrderApi *PayOrderApi) FindPayOrder(c *gin.Context) {
 	ID := c.Query("ID")
 	repayOrder, err := payOrderService.GetPayOrder(ID)
 	if err != nil {
-        global.GVA_LOG.Error(global.Translate("general.queryFail"), zap.Error(err))
+		global.GVA_LOG.Error(global.Translate("general.queryFail"), zap.Error(err))
 		response.FailWithMessage(global.Translate("general.queryFailErr"), c)
 		return
 	}
@@ -141,17 +141,18 @@ func (payOrderApi *PayOrderApi) GetPayOrderList(c *gin.Context) {
 	}
 	list, total, err := payOrderService.GetPayOrderInfoList(pageInfo)
 	if err != nil {
-	    global.GVA_LOG.Error(global.Translate("general.getDataFail"), zap.Error(err))
-        response.FailWithMessage(global.Translate("general.getDataFailErr"), c)
-        return
-    }
-    response.OkWithDetailed(response.PageResult{
-        List:     list,
-        Total:    total,
-        Page:     pageInfo.Page,
-        PageSize: pageInfo.PageSize,
-    }, global.Translate("general.getDataSuccess"), c)
+		global.GVA_LOG.Error(global.Translate("general.getDataFail"), zap.Error(err))
+		response.FailWithMessage(global.Translate("general.getDataFailErr"), c)
+		return
+	}
+	response.OkWithDetailed(response.PageResult{
+		List:     list,
+		Total:    total,
+		Page:     pageInfo.Page,
+		PageSize: pageInfo.PageSize,
+	}, global.Translate("general.getDataSuccess"), c)
 }
+
 // GetPayOrderDataSource 获取PayOrder的数据源
 // @Tags PayOrder
 // @Summary 获取PayOrder的数据源
@@ -160,14 +161,14 @@ func (payOrderApi *PayOrderApi) GetPayOrderList(c *gin.Context) {
 // @Success 200 {object} response.Response{data=object,msg=string} "查询成功"
 // @Router /payOrder/getPayOrderDataSource [get]
 func (payOrderApi *PayOrderApi) GetPayOrderDataSource(c *gin.Context) {
-    // 此接口为获取数据源定义的数据
-    dataSource, err := payOrderService.GetPayOrderDataSource()
-    if err != nil {
-        global.GVA_LOG.Error(global.Translate("general.queryFail"), zap.Error(err))
-   		response.FailWithMessage(global.Translate("general.queryFailErr"), c)
-   		return
-    }
-   response.OkWithData(dataSource, c)
+	// 此接口为获取数据源定义的数据
+	dataSource, err := payOrderService.GetPayOrderDataSource()
+	if err != nil {
+		global.GVA_LOG.Error(global.Translate("general.queryFail"), zap.Error(err))
+		response.FailWithMessage(global.Translate("general.queryFailErr"), c)
+		return
+	}
+	response.OkWithData(dataSource, c)
 }
 
 // GetPayOrderPublic 不需要鉴权的支付订单接口
@@ -179,10 +180,10 @@ func (payOrderApi *PayOrderApi) GetPayOrderDataSource(c *gin.Context) {
 // @Success 200 {object} response.Response{data=object,msg=string} "获取成功"
 // @Router /payOrder/getPayOrderPublic [get]
 func (payOrderApi *PayOrderApi) GetPayOrderPublic(c *gin.Context) {
-    // 此接口不需要鉴权
-    // 示例为返回了一个固定的消息接口，一般本接口用于C端服务，需要自己实现业务逻辑
-    payOrderService.GetPayOrderPublic()
-    response.OkWithDetailed(gin.H{
-       "info": "不需要鉴权的支付订单接口信息",
-    }, "获取成功", c)
+	// 此接口不需要鉴权
+	// 示例为返回了一个固定的消息接口，一般本接口用于C端服务，需要自己实现业务逻辑
+	payOrderService.GetPayOrderPublic()
+	response.OkWithDetailed(gin.H{
+		"info": "不需要鉴权的支付订单接口信息",
+	}, "获取成功", c)
 }

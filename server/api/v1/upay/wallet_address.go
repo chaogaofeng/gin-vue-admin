@@ -1,18 +1,16 @@
 package upay
 
 import (
-	
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
-    "github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
-    "github.com/flipped-aurora/gin-vue-admin/server/model/upay"
-    upayReq "github.com/flipped-aurora/gin-vue-admin/server/model/upay/request"
-    "github.com/gin-gonic/gin"
-    "go.uber.org/zap"
+	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
+	"github.com/flipped-aurora/gin-vue-admin/server/model/upay"
+	upayReq "github.com/flipped-aurora/gin-vue-admin/server/model/upay/request"
+	"github.com/flipped-aurora/gin-vue-admin/server/utils"
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
-type WalletAddressApi struct {}
-
-
+type WalletAddressApi struct{}
 
 // CreateWalletAddress 创建收款钱包
 // @Tags WalletAddress
@@ -30,13 +28,15 @@ func (walletAddressApi *WalletAddressApi) CreateWalletAddress(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
+	uid := int(utils.GetUserID(c))
+	walletAddress.UserID = &uid
 	err = walletAddressService.CreateWalletAddress(&walletAddress)
 	if err != nil {
-        global.GVA_LOG.Error(global.Translate("general.creationFail"), zap.Error(err))
+		global.GVA_LOG.Error(global.Translate("general.creationFail"), zap.Error(err))
 		response.FailWithMessage(global.Translate("general.creationFailErr"), c)
 		return
 	}
-    response.OkWithMessage(global.Translate("general.createSuccess"), c)
+	response.OkWithMessage(global.Translate("general.createSuccess"), c)
 }
 
 // DeleteWalletAddress 删除收款钱包
@@ -52,7 +52,7 @@ func (walletAddressApi *WalletAddressApi) DeleteWalletAddress(c *gin.Context) {
 	ID := c.Query("ID")
 	err := walletAddressService.DeleteWalletAddress(ID)
 	if err != nil {
-        global.GVA_LOG.Error(global.Translate("general.deleteFail"), zap.Error(err))
+		global.GVA_LOG.Error(global.Translate("general.deleteFail"), zap.Error(err))
 		response.FailWithMessage(global.Translate("general.deleteFailErr"), c)
 		return
 	}
@@ -71,7 +71,7 @@ func (walletAddressApi *WalletAddressApi) DeleteWalletAddressByIds(c *gin.Contex
 	IDs := c.QueryArray("IDs[]")
 	err := walletAddressService.DeleteWalletAddressByIds(IDs)
 	if err != nil {
-        global.GVA_LOG.Error(global.Translate("system.sys_operation_record.batchDeleteFail"), zap.Error(err))
+		global.GVA_LOG.Error(global.Translate("system.sys_operation_record.batchDeleteFail"), zap.Error(err))
 		response.FailWithMessage(global.Translate("system.sys_operation_record.batchDeleteFailErr"), c)
 		return
 	}
@@ -96,7 +96,7 @@ func (walletAddressApi *WalletAddressApi) UpdateWalletAddress(c *gin.Context) {
 	}
 	err = walletAddressService.UpdateWalletAddress(walletAddress)
 	if err != nil {
-        global.GVA_LOG.Error(global.Translate("general.updateFail"), zap.Error(err))
+		global.GVA_LOG.Error(global.Translate("general.updateFail"), zap.Error(err))
 		response.FailWithMessage(global.Translate("general.updateFailErr"), c)
 		return
 	}
@@ -116,7 +116,7 @@ func (walletAddressApi *WalletAddressApi) FindWalletAddress(c *gin.Context) {
 	ID := c.Query("ID")
 	rewalletAddress, err := walletAddressService.GetWalletAddress(ID)
 	if err != nil {
-        global.GVA_LOG.Error(global.Translate("general.queryFail"), zap.Error(err))
+		global.GVA_LOG.Error(global.Translate("general.queryFail"), zap.Error(err))
 		response.FailWithMessage(global.Translate("general.queryFailErr"), c)
 		return
 	}
@@ -141,17 +141,18 @@ func (walletAddressApi *WalletAddressApi) GetWalletAddressList(c *gin.Context) {
 	}
 	list, total, err := walletAddressService.GetWalletAddressInfoList(pageInfo)
 	if err != nil {
-	    global.GVA_LOG.Error(global.Translate("general.getDataFail"), zap.Error(err))
-        response.FailWithMessage(global.Translate("general.getDataFailErr"), c)
-        return
-    }
-    response.OkWithDetailed(response.PageResult{
-        List:     list,
-        Total:    total,
-        Page:     pageInfo.Page,
-        PageSize: pageInfo.PageSize,
-    }, global.Translate("general.getDataSuccess"), c)
+		global.GVA_LOG.Error(global.Translate("general.getDataFail"), zap.Error(err))
+		response.FailWithMessage(global.Translate("general.getDataFailErr"), c)
+		return
+	}
+	response.OkWithDetailed(response.PageResult{
+		List:     list,
+		Total:    total,
+		Page:     pageInfo.Page,
+		PageSize: pageInfo.PageSize,
+	}, global.Translate("general.getDataSuccess"), c)
 }
+
 // GetWalletAddressDataSource 获取WalletAddress的数据源
 // @Tags WalletAddress
 // @Summary 获取WalletAddress的数据源
@@ -160,14 +161,14 @@ func (walletAddressApi *WalletAddressApi) GetWalletAddressList(c *gin.Context) {
 // @Success 200 {object} response.Response{data=object,msg=string} "查询成功"
 // @Router /walletAddress/getWalletAddressDataSource [get]
 func (walletAddressApi *WalletAddressApi) GetWalletAddressDataSource(c *gin.Context) {
-    // 此接口为获取数据源定义的数据
-    dataSource, err := walletAddressService.GetWalletAddressDataSource()
-    if err != nil {
-        global.GVA_LOG.Error(global.Translate("general.queryFail"), zap.Error(err))
-   		response.FailWithMessage(global.Translate("general.queryFailErr"), c)
-   		return
-    }
-   response.OkWithData(dataSource, c)
+	// 此接口为获取数据源定义的数据
+	dataSource, err := walletAddressService.GetWalletAddressDataSource()
+	if err != nil {
+		global.GVA_LOG.Error(global.Translate("general.queryFail"), zap.Error(err))
+		response.FailWithMessage(global.Translate("general.queryFailErr"), c)
+		return
+	}
+	response.OkWithData(dataSource, c)
 }
 
 // GetWalletAddressPublic 不需要鉴权的收款钱包接口
@@ -179,10 +180,10 @@ func (walletAddressApi *WalletAddressApi) GetWalletAddressDataSource(c *gin.Cont
 // @Success 200 {object} response.Response{data=object,msg=string} "获取成功"
 // @Router /walletAddress/getWalletAddressPublic [get]
 func (walletAddressApi *WalletAddressApi) GetWalletAddressPublic(c *gin.Context) {
-    // 此接口不需要鉴权
-    // 示例为返回了一个固定的消息接口，一般本接口用于C端服务，需要自己实现业务逻辑
-    walletAddressService.GetWalletAddressPublic()
-    response.OkWithDetailed(gin.H{
-       "info": "不需要鉴权的收款钱包接口信息",
-    }, "获取成功", c)
+	// 此接口不需要鉴权
+	// 示例为返回了一个固定的消息接口，一般本接口用于C端服务，需要自己实现业务逻辑
+	walletAddressService.GetWalletAddressPublic()
+	response.OkWithDetailed(gin.H{
+		"info": "不需要鉴权的收款钱包接口信息",
+	}, "获取成功", c)
 }

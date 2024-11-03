@@ -12,4 +12,5 @@ var (
 	appApi           = api.ApiGroupApp.UpayApiGroup.APPApi
 	walletAddressApi = api.ApiGroupApp.UpayApiGroup.WalletAddressApi
 	payOrderApi      = api.ApiGroupApp.UpayApiGroup.PayOrderApi
+	openApi          = api.ApiGroupApp.UpayApiGroup.OpenApi
 )

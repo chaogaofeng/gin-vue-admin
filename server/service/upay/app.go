@@ -43,6 +43,11 @@ func (appService *APPService) GetAPP(ID string) (app upay.APP, err error) {
 	return
 }
 
+func (appService *APPService) GetAPPByAppID(appId string) (app upay.APP, err error) {
+	err = global.GVA_DB.Where("app_id = ?", appId).First(&app).Error
+	return
+}
+
 // GetAPPInfoList 分页获取应用记录
 // Author [yourname](https://github.com/yourname)
 func (appService *APPService) GetAPPInfoList(info upayReq.APPSearch) (list []upay.APP, total int64, err error) {

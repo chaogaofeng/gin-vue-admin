@@ -28,8 +28,7 @@ func (walletAddressApi *WalletAddressApi) CreateWalletAddress(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	uid := int(utils.GetUserID(c))
-	walletAddress.UserID = &uid
+	walletAddress.UserID = utils.GetUserID(c)
 	err = walletAddressService.CreateWalletAddress(&walletAddress)
 	if err != nil {
 		global.GVA_LOG.Error(global.Translate("general.creationFail"), zap.Error(err))

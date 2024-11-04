@@ -88,7 +88,7 @@ func (payOrderService *PayOrderService) GetPayOrderInfoList(info upayReq.PayOrde
 	if info.RiskLevel != "" {
 		db = db.Where("risk_level = ?", info.RiskLevel)
 	}
-	if info.UserID != nil {
+	if info.UserID != 0 {
 		db = db.Where("user_id = ?", info.UserID)
 	}
 	err = db.Count(&total).Error

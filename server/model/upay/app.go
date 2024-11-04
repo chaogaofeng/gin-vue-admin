@@ -10,11 +10,11 @@ import (
 // 应用 结构体  APP
 type APP struct {
 	global.GVA_MODEL
-	AppId     string `json:"appId" form:"appId" gorm:"uniqueIndex;column:app_id;comment:应用标识;" binding:"required"`        //应用标识
-	AppSecret string `json:"appSecret" form:"appSecret" gorm:"unique;column:app_secret;comment:应用密钥;" binding:"required"` //应用密钥
-	AppName   string `json:"appName" form:"appName" gorm:"column:app_name;comment:应用名称;"`                                 //应用名称
-	UserID    *int   `json:"userID" form:"userID" gorm:"column:user_id;comment:用户;"`                                      //用户
-	Status    string `json:"status" form:"status" gorm:"default:0;column:status;comment:应用状态;" binding:"required"`        //应用状态
+	AppName   string `json:"appName" form:"appName" gorm:"column:app_name;comment:应用名称;"`              //应用名称
+	AppId     string `json:"appId" form:"appId" gorm:"uniqueIndex;column:app_id;comment:应用标识;"`        //应用标识
+	AppSecret string `json:"appSecret" form:"appSecret" gorm:"unique;column:app_secret;comment:应用密钥;"` //应用密钥
+	Status    string `json:"status" form:"status" gorm:"default:0;column:status;comment:应用状态;"`        //应用状态
+	UserID    uint   `json:"userID" form:"userID" gorm:"column:user_id;comment:用户;"`                   //用户
 }
 
 // TableName 应用 APP自定义表名 upay_app
@@ -23,7 +23,6 @@ func (APP) TableName() string {
 }
 
 func (app *APP) BeforeCreate(db *gorm.DB) error {
-	// 自动生成 AppId 和 AppSecret
 	if len(app.AppId) == 0 {
 		for {
 			appId, err := utils.GenerateRandomString(8)
@@ -34,7 +33,7 @@ func (app *APP) BeforeCreate(db *gorm.DB) error {
 			if err := db.Model(&APP{}).Where("app_id = ?", appId).Count(&count).Error; err != nil {
 				return err
 			}
-			if count > 0 {
+			if count == 0 {
 				app.AppId = appId
 				break
 			}
@@ -50,19 +49,19 @@ func (app *APP) BeforeCreate(db *gorm.DB) error {
 			if err := db.Model(&APP{}).Where("app_secret = ?", appSecret).Count(&count).Error; err != nil {
 				return err
 			}
-			if count > 0 {
+			if count == 0 {
 				app.AppSecret = appSecret
 				break
 			}
 		}
 	}
-	if len(app.AppName) == 0 {
-		name, err := utils.GenerateRandomString(6)
-		if err != nil {
-			return err
-		}
-		app.AppName = name
-
-	}
+	//if len(app.AppName) == 0 {
+	//	name, err := utils.GenerateRandomString(6)
+	//	if err != nil {
+	//		return err
+	//	}
+	//	app.AppName = name
+	//
+	//}
 	return nil
 }

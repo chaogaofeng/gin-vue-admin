@@ -28,8 +28,7 @@ func (appApi *APPApi) CreateAPP(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	uid := int(utils.GetUserID(c))
-	app.UserID = &uid
+	app.UserID = utils.GetUserID(c)
 	err = appService.CreateAPP(&app)
 	if err != nil {
 		global.GVA_LOG.Error(global.Translate("general.creationFail"), zap.Error(err))

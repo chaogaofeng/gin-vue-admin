@@ -28,8 +28,7 @@ func (payOrderApi *PayOrderApi) CreatePayOrder(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	uid := int(utils.GetUserID(c))
-	payOrder.UserID = &uid
+	payOrder.UserID = utils.GetUserID(c)
 	err = payOrderService.CreatePayOrder(&payOrder)
 	if err != nil {
 		global.GVA_LOG.Error(global.Translate("general.creationFail"), zap.Error(err))

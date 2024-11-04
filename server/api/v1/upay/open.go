@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
+	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/upay"
 	upayReq "github.com/flipped-aurora/gin-vue-admin/server/model/upay/request"
@@ -16,7 +17,10 @@ import (
 	"strings"
 )
 
-type OpenApi struct{}
+const (
+	ERROR   = 0
+	SUCCESS = 1
+)
 
 type Response struct {
 	Code int         `json:"code"`
@@ -30,6 +34,8 @@ type PageResult struct {
 	Page     string      `json:"page"`
 	PageSize string      `json:"pageSize"`
 }
+
+type OpenApi struct{}
 
 // 生成签名的函数
 func generateSignature(params map[string]string, appSecret string) string {
@@ -68,9 +74,9 @@ func (openApi *OpenApi) OrderApply(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusOK, Response{
-			0,
+			ERROR,
 			map[string]interface{}{},
-			err.Error(),
+			fmt.Sprintf("invalid request: %v", err.Error()),
 		})
 		return
 	}
@@ -78,9 +84,9 @@ func (openApi *OpenApi) OrderApply(c *gin.Context) {
 	amount, err := decimal.NewFromString(req.FiatAmount)
 	if err != nil {
 		c.JSON(http.StatusOK, Response{
-			0,
+			ERROR,
 			map[string]interface{}{},
-			err.Error(),
+			fmt.Sprintf("invalid fiatAmount: %v", err.Error()),
 		})
 		return
 	}
@@ -88,14 +94,12 @@ func (openApi *OpenApi) OrderApply(c *gin.Context) {
 	app, err := appService.GetAPPByAppID(req.AppID)
 	if err != nil {
 		c.JSON(http.StatusOK, Response{
-			0,
+			ERROR,
 			map[string]interface{}{},
-			err.Error(),
+			fmt.Sprintf("invalid appId: %v", err.Error()),
 		})
 		return
 	}
-
-	appSecret := app.AppSecret
 
 	// 将请求参数放入 map 中以生成签名
 	params := map[string]string{
@@ -107,13 +111,39 @@ func (openApi *OpenApi) OrderApply(c *gin.Context) {
 		"notifyUrl":       req.NotifyUrl,
 	}
 
+	_, total, err := walletAddressService.GetWalletAddressInfoList(upayReq.WalletAddressSearch{
+		UserID:    app.UserID,
+		ChainType: req.ChainType,
+		Status:    "0",
+		PageInfo: request.PageInfo{
+			Page:     1,
+			PageSize: 10,
+		},
+	})
+	if err != nil {
+		c.JSON(http.StatusOK, Response{
+			ERROR,
+			map[string]interface{}{},
+			fmt.Sprintf("Invaid address: %v", err.Error()),
+		})
+		return
+	}
+	if total == 0 {
+		c.JSON(http.StatusOK, Response{
+			ERROR,
+			map[string]interface{}{},
+			"Not found address",
+		})
+		return
+	}
+
 	// 生成签名
-	expectedSignature := generateSignature(params, appSecret)
+	expectedSignature := generateSignature(params, app.AppSecret)
 
 	// 校验签名
 	if req.Signature != expectedSignature {
 		c.JSON(http.StatusOK, Response{
-			0,
+			ERROR,
 			map[string]interface{}{},
 			"Invalid signature",
 		})
@@ -135,9 +165,9 @@ func (openApi *OpenApi) OrderApply(c *gin.Context) {
 	err = payOrderService.CreatePayOrder(order)
 	if err != nil {
 		c.JSON(http.StatusOK, Response{
-			0,
+			ERROR,
 			map[string]interface{}{},
-			err.Error(),
+			fmt.Sprintf("%v: %v", global.Translate("general.creationFailErr"), err.Error()),
 		})
 		return
 	}
@@ -157,9 +187,9 @@ func (openApi *OpenApi) OrderApply(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, Response{
-		1,
+		SUCCESS,
 		ret,
-		"success",
+		global.Translate("general.createSuccess"),
 	})
 }
 
@@ -168,9 +198,9 @@ func (openApi *OpenApi) OrderSearch(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusOK, Response{
-			0,
+			ERROR,
 			map[string]interface{}{},
-			err.Error(),
+			fmt.Sprintf("invalid request: %v", err.Error()),
 		})
 		return
 	}
@@ -180,12 +210,10 @@ func (openApi *OpenApi) OrderSearch(c *gin.Context) {
 		c.JSON(http.StatusOK, Response{
 			0,
 			map[string]interface{}{},
-			err.Error(),
+			fmt.Sprintf("invalid appId: %v", err.Error()),
 		})
 		return
 	}
-
-	appSecret := app.AppSecret
 
 	// 将请求参数放入 map 中以生成签名
 	params := map[string]string{
@@ -194,12 +222,12 @@ func (openApi *OpenApi) OrderSearch(c *gin.Context) {
 	}
 
 	// 生成签名
-	expectedSignature := generateSignature(params, appSecret)
+	expectedSignature := generateSignature(params, app.AppSecret)
 
 	// 校验签名
 	if req.Signature != expectedSignature {
 		c.JSON(http.StatusOK, Response{
-			0,
+			ERROR,
 			map[string]interface{}{},
 			"Invalid signature",
 		})
@@ -212,9 +240,9 @@ func (openApi *OpenApi) OrderSearch(c *gin.Context) {
 	})
 	if err != nil {
 		c.JSON(http.StatusOK, Response{
-			0,
+			ERROR,
 			map[string]interface{}{},
-			err.Error(),
+			fmt.Sprintf("invalid appId or merchantOrderNo: %v", err.Error()),
 		})
 		return
 	}
@@ -236,14 +264,14 @@ func (openApi *OpenApi) OrderSearch(c *gin.Context) {
 			if order.CompletedAt.IsZero() {
 				return 0 // 返回默认值
 			}
-			return order.CompletedAt.Unix() // 返回实际值
+			return order.CompletedAt.Unix()
 		}(),
 	}
 
 	c.JSON(http.StatusOK, Response{
-		1,
+		SUCCESS,
 		ret,
-		"success",
+		global.Translate("general.getDataSuccess"),
 	})
 }
 
@@ -252,9 +280,9 @@ func (openApi *OpenApi) QueryAll(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusOK, Response{
-			0,
+			ERROR,
 			map[string]interface{}{},
-			err.Error(),
+			fmt.Sprintf("invalid request: %v", err.Error()),
 		})
 		return
 	}
@@ -264,12 +292,10 @@ func (openApi *OpenApi) QueryAll(c *gin.Context) {
 		c.JSON(http.StatusOK, Response{
 			0,
 			map[string]interface{}{},
-			err.Error(),
+			fmt.Sprintf("invalid appId: %v", err.Error()),
 		})
 		return
 	}
-
-	appSecret := app.AppSecret
 
 	params := map[string]string{
 		"appId":    req.AppID,
@@ -277,11 +303,11 @@ func (openApi *OpenApi) QueryAll(c *gin.Context) {
 		"pageSize": req.PageSize,
 	}
 
-	expectedSignature := generateSignature(params, appSecret)
+	expectedSignature := generateSignature(params, app.AppSecret)
 
 	if req.Signature != expectedSignature {
 		c.JSON(http.StatusOK, Response{
-			0,
+			ERROR,
 			map[string]interface{}{},
 			"Invalid signature",
 		})
@@ -300,9 +326,9 @@ func (openApi *OpenApi) QueryAll(c *gin.Context) {
 	})
 	if err != nil {
 		c.JSON(http.StatusOK, Response{
-			0,
+			ERROR,
 			map[string]interface{}{},
-			err.Error(),
+			fmt.Sprintf("invalid appId: %v", err.Error()),
 		})
 		return
 	}
@@ -337,8 +363,8 @@ func (openApi *OpenApi) QueryAll(c *gin.Context) {
 		List:     orders,
 	}
 	c.JSON(http.StatusOK, Response{
-		1,
+		SUCCESS,
 		ret,
-		"success",
+		global.Translate("general.getDataSuccess"),
 	})
 }

@@ -21,8 +21,15 @@ import (
 //@return: error
 
 func ScanTronUSDT(db *gorm.DB) error {
+	// 查找所有过期的订单并更新状态
+	currentTime := time.Now()
+	if err := db.Model(&upay.PayOrder{}).
+		Where("status = ? AND expired_at < ?", 0, currentTime).
+		Update("status", 2).Error; err != nil {
+		return fmt.Errorf("update order status=2 error: %v", err)
+	}
+
 	var orders []upay.PayOrder
-	// 使用原生 SQL 查询，按 receiver 去重并找出 status = 0 的订单
 	query := `
 		SELECT DISTINCT ON (receiver) *
 		FROM pay_orders
@@ -31,13 +38,12 @@ func ScanTronUSDT(db *gorm.DB) error {
 	`
 	err := db.Raw(query).Scan(&orders).Error
 	if err != nil {
-		return fmt.Errorf("fetching orders error: %v", err)
+		return fmt.Errorf("fetching order status=0 error: %v", err)
 	}
 
 	baseUrl := global.GVA_CONFIG.TronGrid.BaseURL
 	apiKeys := global.GVA_CONFIG.TronGrid.ApiKeys
 	contractAddress := global.GVA_CONFIG.TronGrid.TRC20
-
 	if len(baseUrl) == 0 || len(apiKeys) == 0 || len(contractAddress) == 0 {
 		return nil
 	}
@@ -47,7 +53,7 @@ func ScanTronUSDT(db *gorm.DB) error {
 		for _, apiKey := range apiKeys {
 			transactions, err := findTRC20(baseUrl, apiKey, address, order.CreatedAt.Unix(), contractAddress)
 			if err != nil {
-				return err
+				return fmt.Errorf("fetching order tx error: %v", err)
 			}
 
 			for _, transaction := range transactions {
@@ -61,9 +67,10 @@ func ScanTronUSDT(db *gorm.DB) error {
 						CompletedAt:  &completedAt,
 						Hash:         transaction.TransactionID,
 						ActualAmount: value,
+						NotifyAt:     &completedAt,
 					}).Error
 				if err != nil {
-					return err
+					return fmt.Errorf("update order status=1 error: %v", err)
 				}
 				if len(order.NotifyUrl) == 0 {
 					continue

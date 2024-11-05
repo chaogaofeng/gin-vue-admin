@@ -30,6 +30,7 @@ type PayOrder struct {
 	CompletedAt     *time.Time      `json:"completedAt" form:"completedAt" gorm:"column:completed_at;comment:完成时间;"`                                              //完成时间
 	RiskLevel       string          `json:"riskLevel" form:"riskLevel" gorm:"default:0;column:risk_level;comment:风控级别;"`                                          //风控级别
 	UserID          uint            `json:"userID" form:"userID" gorm:"column:user_id;comment:用户;"`                                                               //用户
+	NotifyAt        *time.Time      `json:"notifydAt" form:"notifydAt" gorm:"column:notifyd_at;comment:通知时间;"`                                                    //通知时间
 }
 
 // TableName 支付订单 PayOrder自定义表名 upay_pay_order

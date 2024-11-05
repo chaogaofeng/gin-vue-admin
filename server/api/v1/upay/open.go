@@ -1,20 +1,16 @@
 package upay
 
 import (
-	"crypto/md5"
-	"encoding/hex"
 	"fmt"
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/upay"
 	upayReq "github.com/flipped-aurora/gin-vue-admin/server/model/upay/request"
+	"github.com/flipped-aurora/gin-vue-admin/server/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/shopspring/decimal"
 	"net/http"
-	"net/url"
-	"sort"
 	"strconv"
-	"strings"
 )
 
 const (
@@ -36,38 +32,6 @@ type PageResult struct {
 }
 
 type OpenApi struct{}
-
-// 生成签名的函数
-func generateSignature(params map[string]string, appSecret string) string {
-	// 删除 signature 参数（因为不参与签名）
-	delete(params, "signature")
-
-	// 提取并按 ASCII 顺序排序参数名
-	var keys []string
-	for k := range params {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-
-	// 拼接成 key=value&key2=value2… 格式的字符串
-	var stringA strings.Builder
-	for i, k := range keys {
-		stringA.WriteString(fmt.Sprintf("%s=%s", k, url.QueryEscape(params[k])))
-		if i < len(keys)-1 {
-			stringA.WriteString("&")
-		}
-	}
-
-	// 在 stringA 末尾添加 appSecret
-	stringSignTemp := stringA.String() + "&appSecret=" + appSecret
-
-	// 进行 MD5 运算
-	hash := md5.New()
-	hash.Write([]byte(stringSignTemp))
-	signature := strings.ToUpper(hex.EncodeToString(hash.Sum(nil))) // 转换为大写
-
-	return signature
-}
 
 func (openApi *OpenApi) OrderApply(c *gin.Context) {
 	var req upayReq.OrderRequest
@@ -138,7 +102,7 @@ func (openApi *OpenApi) OrderApply(c *gin.Context) {
 	}
 
 	// 生成签名
-	expectedSignature := generateSignature(params, app.AppSecret)
+	expectedSignature := utils.GenerateSignature(params, app.AppSecret)
 
 	// 校验签名
 	if req.Signature != expectedSignature {
@@ -222,7 +186,7 @@ func (openApi *OpenApi) OrderSearch(c *gin.Context) {
 	}
 
 	// 生成签名
-	expectedSignature := generateSignature(params, app.AppSecret)
+	expectedSignature := utils.GenerateSignature(params, app.AppSecret)
 
 	// 校验签名
 	if req.Signature != expectedSignature {
@@ -259,13 +223,13 @@ func (openApi *OpenApi) OrderSearch(c *gin.Context) {
 		ActualPoundage:  order.ActualFee.String(),
 		Status:          order.Status,
 		Attach:          order.Attach,
-		CreatedAt:       order.CreatedAt.Unix(),
-		CompletedAt: func() int64 {
+		CreatedAt:       strconv.FormatInt(order.CreatedAt.Unix(), 10),
+		CompletedAt: strconv.FormatInt(func() int64 {
 			if order.CompletedAt.IsZero() {
 				return 0 // 返回默认值
 			}
 			return order.CompletedAt.Unix()
-		}(),
+		}(), 10),
 	}
 
 	c.JSON(http.StatusOK, Response{
@@ -303,7 +267,7 @@ func (openApi *OpenApi) QueryAll(c *gin.Context) {
 		"pageSize": req.PageSize,
 	}
 
-	expectedSignature := generateSignature(params, app.AppSecret)
+	expectedSignature := utils.GenerateSignature(params, app.AppSecret)
 
 	if req.Signature != expectedSignature {
 		c.JSON(http.StatusOK, Response{
@@ -346,13 +310,13 @@ func (openApi *OpenApi) QueryAll(c *gin.Context) {
 			ActualPoundage:  order.ActualFee.String(),
 			Status:          order.Status,
 			Attach:          order.Attach,
-			CreatedAt:       order.CreatedAt.Unix(),
-			CompletedAt: func() int64 {
+			CreatedAt:       strconv.FormatInt(order.CreatedAt.Unix(), 10),
+			CompletedAt: strconv.FormatInt(func() int64 {
 				if order.CompletedAt.IsZero() {
 					return 0 // 返回默认值
 				}
 				return order.CompletedAt.Unix() // 返回实际值
-			}(),
+			}(), 10),
 		})
 	}
 

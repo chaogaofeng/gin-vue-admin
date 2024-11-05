@@ -235,3 +235,8 @@ zap:
     show-line: true
     log-in-console: true
     retention-day: -1
+tron-grid:
+    base-url: https://api.trongrid.io
+    api-keys:
+        - ""
+    trc20: TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t

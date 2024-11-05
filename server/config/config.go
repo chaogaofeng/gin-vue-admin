@@ -36,4 +36,7 @@ type Server struct {
 
 	// added by mohamed hassan to support multi-language
 	Language Language `mapstructure:"language" json:"language" yaml:"language"`
+
+	//trongrid
+	TronGrid TronGrid `mapstructure:"tron-grid" json:"tron-grid" yaml:"tron-grid"`
 }

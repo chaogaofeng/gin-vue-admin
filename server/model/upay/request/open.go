@@ -50,8 +50,8 @@ type Order struct {
 	ActualPoundage  string `json:"actualPoundage"`
 	Status          string `json:"status"`
 	Attach          string `json:"attach"`
-	CreatedAt       int64  `json:"createdAt"`
-	CompletedAt     int64  `json:"completedAt"`
+	CreatedAt       string `json:"createdAt"`
+	CompletedAt     string `json:"completedAt"`
 }
 
 type QueryAllResponse struct {

@@ -32,7 +32,7 @@ func ScanTronUSDT(db *gorm.DB) error {
 	var orders []upay.PayOrder
 	query := `
 		SELECT DISTINCT receiver
-		FROM pay_orders
+		FROM upay_pay_orders
 		WHERE status = 0
 		ORDER BY created_at ASC;
 	`

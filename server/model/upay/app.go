@@ -10,11 +10,11 @@ import (
 // 应用 结构体  APP
 type APP struct {
 	global.GVA_MODEL
-	AppName   string `json:"appName" form:"appName" gorm:"column:app_name;comment:应用名称;"`              //应用名称
-	AppId     string `json:"appId" form:"appId" gorm:"uniqueIndex;column:app_id;comment:应用标识;"`        //应用标识
-	AppSecret string `json:"appSecret" form:"appSecret" gorm:"unique;column:app_secret;comment:应用密钥;"` //应用密钥
-	Status    string `json:"status" form:"status" gorm:"default:0;column:status;comment:应用状态;"`        //应用状态
-	UserID    uint   `json:"userID" form:"userID" gorm:"column:user_id;comment:用户;"`                   //用户
+	AppName   string `json:"appName" form:"appName" gorm:"column:app_name;comment:应用名称;"`       //应用名称
+	AppId     string `json:"appId" form:"appId" gorm:"uniqueIndex;column:app_id;comment:应用标识;"` //应用标识
+	AppSecret string `json:"appSecret" form:"appSecret" gorm:"column:app_secret;comment:应用密钥;"` //应用密钥
+	Status    string `json:"status" form:"status" gorm:"default:0;column:status;comment:应用状态;"` //应用状态
+	UserID    uint   `json:"userID" form:"userID" gorm:"column:user_id;comment:用户;"`            //用户
 }
 
 // TableName 应用 APP自定义表名 upay_app

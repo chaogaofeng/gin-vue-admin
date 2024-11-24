@@ -25,16 +25,15 @@ func ScanTronUSDT(db *gorm.DB) error {
 	currentTime := time.Now()
 	if err := db.Model(&upay.PayOrder{}).
 		Where("status = ? AND expired_at < ?", 0, currentTime).
-		Update("status", 2).Error; err != nil {
+		Update("status", "2").Error; err != nil {
 		return fmt.Errorf("update order status=2 error: %v", err)
 	}
 
 	var orders []upay.PayOrder
 	query := `
 		SELECT DISTINCT receiver
-		FROM upay_pay_orders
-		WHERE status = 0
-		ORDER BY created_at ASC;
+		FROM upay_pay_order
+		WHERE status = "0";
 	`
 	err := db.Raw(query).Scan(&orders).Error
 	if err != nil {
@@ -106,7 +105,6 @@ func ScanTronUSDT(db *gorm.DB) error {
 						// 通知
 						resp, err := http.Post(order.NotifyUrl, "application/json", bytes.NewBuffer(data))
 						if err != nil {
-
 						}
 						defer resp.Body.Close()
 					}
